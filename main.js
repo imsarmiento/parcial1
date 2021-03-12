@@ -1,8 +1,8 @@
 const dataURL = "'data.json'";
 
 const category_list = document.getElementById("category-list");
-
 const product_list = document.getElementById("product-list");
+const cart_items = document.getElementById("cart-items");
 
 // Obtener los datos y crear la tabla
 fetch("data.json", {
@@ -39,9 +39,28 @@ fetch("data.json", {
 
 function viewProducts(products) {
   var html = "";
+  product_list.innerHTML = "";
   products.forEach((product) => {
-    console.log(product["name"]);
-    html += "<p>" + product["name"] + "</p>";
+    //console.log(product["name"]);
+    var p = document.createElement("p");
+    var text = document.createTextNode(product["name"]);
+    p.appendChild(text);
+    var button = document.createElement("button");
+    text = document.createTextNode("Add to cart");
+    button.appendChild(text);
+    product_list.append(p);
+    product_list.append(button);
+    button.addEventListener(
+      "click",
+      function () {
+        addToCart(product);
+      },
+      false
+    );
   });
-  product_list.innerHTML = html;
+}
+
+function addToCart(product) {
+  items = parseInt(cart_items.innerHTML[0]) + 1;
+  cart_items.innerHTML = items + " items";
 }
