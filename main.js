@@ -1,5 +1,8 @@
 const dataURL = "'data.json'";
 
+/**
+ * Elementos del DOM
+ */
 const category_list = document.getElementById("category-list");
 const product_list = document.getElementById("product-list");
 const cartButton = document.getElementById("cart");
@@ -7,6 +10,14 @@ const cart_items = document.getElementById("cart-items");
 const page_title = document.getElementById("page-title");
 const confirm_cancel_button = document.getElementById("confirm-cancel-button");
 
+/**
+ * Carrito
+ */
+var cart = {};
+
+/**
+ * Funcionalidad del Carrito
+ */
 cartButton.addEventListener(
   "click",
   function () {
@@ -15,24 +26,29 @@ cartButton.addEventListener(
   false
 );
 
+/**
+ * Funcionalidad de cancelar orden
+ */
 confirm_cancel_button.onclick = cancelOrder;
 
-var cart = {};
-
-// Obtener los datos y crear la tabla
-fetch("data.json", {
-  headers: {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  },
-})
+/**
+ * Obtener los datos y crear la interfax básica
+ * Se puede hacer local utilizando la ruta local del .json y descomentando las lineas
+ */
+fetch(
+  "https://gist.githubusercontent.com/josejbocanegra/9a28c356416badb8f9173daf36d1460b/raw/5ea84b9d43ff494fcbf5c5186544a18b42812f09/restaurant.json" //, {
+  //headers: {
+  // "Content-Type": "application/json",
+  //  Accept: "application/json",
+  //},}
+)
   .then((response) => response.json())
   .then((info) => {
     data = info;
-    console.log(data);
+    //console.log(data);
 
     data.forEach((element) => {
-      console.log(element["name"]);
+      //console.log(element["name"]);
       const li = document.createElement("li");
       li.classList.add("nav-item", "px-3");
       category_list.appendChild(li);
@@ -53,6 +69,11 @@ fetch("data.json", {
     viewProducts(data[0]["name"], data[0]["products"]);
   });
 
+/**
+ * Visualizacion de los productos
+ * @param {*} category
+ * @param {*} products
+ */
 function viewProducts(category, products) {
   product_list.innerHTML = "";
   page_title.innerHTML = "";
@@ -125,6 +146,10 @@ function viewProducts(category, products) {
   title.appendChild(text);
 }
 
+/**
+ * Agregar un producto al carrito
+ * @param {*} product
+ */
 function addToCart(product) {
   if (cart[product["name"]] == null)
     cart[product["name"]] = {
@@ -133,11 +158,14 @@ function addToCart(product) {
     };
   cart[product["name"]]["qty"] += 1;
 
-  console.log(cart);
+  //console.log(cart);
   items = amountOfItems();
   cart_items.innerHTML = items + " items";
 }
 
+/**
+ * Visualizacion del Carrito
+ */
 function goToCart() {
   product_list.innerHTML = "";
   page_title.innerHTML = "";
@@ -162,7 +190,7 @@ function goToCart() {
   var i = 0;
   var total = 0;
   for (const [key, value] of Object.entries(cart)) {
-    console.log(value);
+    //console.log(value);
     i += 1;
     var newRow = body.insertRow(-1);
     newRow.setAttribute("id", key);
@@ -180,7 +208,7 @@ function goToCart() {
   var p_tot = document.createElement("p");
   p_tot.setAttribute("id", "total_money");
   p_tot.classList.add("fw-bold");
-  p_tot.innerHTML = "Total: $" + total;
+  p_tot.innerHTML = "Total: $" + formatNumbers(total);
   div_col1.appendChild(p_tot);
 
   var div_col2 = document.createElement("div");
@@ -197,17 +225,10 @@ function goToCart() {
   cancel.setAttribute("data-bs-toggle", "modal");
   cancel.setAttribute("data-bs-target", "#exampleModal");
   cancel.innerHTML = "Cancel";
-  cancel.addEventListener(
-    "click",
-    function () {
-      cancelOrder();
-    },
-    false
-  );
   div_3.appendChild(cancel);
 
   var confirm = document.createElement("button");
-  confirm.classList.add("btn", "white-button", "mx-1");
+  confirm.classList.add("btn", "white-button", "mx-1", "me-5");
   confirm.innerHTML = "Confirm order";
   confirm.addEventListener(
     "click",
@@ -221,34 +242,14 @@ function goToCart() {
   product_list.appendChild(div_row);
 }
 
-function amountOfItems() {
-  var am = 0;
-  for (const [key, value] of Object.entries(cart)) {
-    am += value["qty"];
-  }
-  return am;
-}
-
-function addProduct(product_name) {
-  cart[product_name]["qty"] += 1;
-  //console.log(cart);
-  const thisRow = document.getElementById(product_name);
-  addQtyRow(thisRow);
-  const total = calcTotal();
-  const total_money = document.getElementById("total_money");
-  total_money.innerHTML = "Total: $" + total;
-}
-
-function removeProduct(product_name) {
-  cart[product_name]["qty"] -= 1;
-  //console.log(cart);
-  const thisRow = document.getElementById(product_name);
-  rmQtyRow(thisRow);
-  const total = calcTotal();
-  const total_money = document.getElementById("total_money");
-  total_money.innerHTML = "Total: $" + total;
-}
-
+/**
+ * Crear una fila de la tabla de OrdenDetail
+ * @param {*} newRow
+ * @param {*} key
+ * @param {*} value
+ * @param {*} i
+ * @returns
+ */
 function createRow(newRow, key, value, i) {
   total = 0;
   var newCell = newRow.insertCell(-1);
@@ -270,7 +271,7 @@ function createRow(newRow, key, value, i) {
   newCell.appendChild(newText);
 
   newCell = newRow.insertCell(-1);
-  newText = document.createTextNode(price * qty);
+  newText = document.createTextNode(formatNumbers(price * qty));
   newCell.appendChild(newText);
 
   newCell = newRow.insertCell(-1);
@@ -300,20 +301,74 @@ function createRow(newRow, key, value, i) {
   return price * qty;
 }
 
+/**
+ * Conteo de items
+ * @returns conteo
+ */
+function amountOfItems() {
+  var am = 0;
+  for (const [key, value] of Object.entries(cart)) {
+    am += value["qty"];
+  }
+  return am;
+}
+
+/**
+ * Agregar cantidad a un producto
+ * @param {*} product_name
+ */
+function addProduct(product_name) {
+  cart[product_name]["qty"] += 1;
+  //console.log(cart);
+  const thisRow = document.getElementById(product_name);
+  addQtyRow(thisRow);
+  const total = calcTotal();
+  const total_money = document.getElementById("total_money");
+  total_money.innerHTML = "Total: $" + formatNumbers(total);
+}
+
+/**
+ * Disminuir cantidad a un producto
+ * @param {*} product_name
+ */
+function removeProduct(product_name) {
+  cart[product_name]["qty"] -= 1;
+  //console.log(cart);
+  const thisRow = document.getElementById(product_name);
+  rmQtyRow(thisRow);
+  const total = calcTotal();
+  const total_money = document.getElementById("total_money");
+  total_money.innerHTML = "Total: $" + formatNumbers(total);
+}
+
+/**
+ * Actualizar tabla al agregar cantidad a un producto
+ * @param {*} row
+ */
 function addQtyRow(row) {
   const qty = parseInt(row.cells.item(1).innerHTML);
   row.cells.item(1).innerHTML = qty + 1;
-  row.cells.item(4).innerHTML =
-    parseFloat(row.cells.item(3).innerHTML) * (qty + 1);
+  row.cells.item(4).innerHTML = formatNumbers(
+    parseFloat(row.cells.item(3).innerHTML) * (qty + 1)
+  );
 }
 
+/**
+ * Actualizar tabla al dimsinuir cantidad a un producto
+ * @param {*} row
+ */
 function rmQtyRow(row) {
   const qty = parseInt(row.cells.item(1).innerHTML);
   row.cells.item(1).innerHTML = qty - 1;
-  row.cells.item(4).innerHTML =
-    parseFloat(row.cells.item(3).innerHTML) * (qty - 1);
+  row.cells.item(4).innerHTML = formatNumbers(
+    parseFloat(row.cells.item(3).innerHTML) * (qty - 1)
+  );
 }
 
+/**
+ * Calcular el total de la orden
+ * @returns calcula el total
+ */
 function calcTotal() {
   var total = 0;
   for (const [key, value] of Object.entries(cart)) {
@@ -324,11 +379,9 @@ function calcTotal() {
   return total;
 }
 
-function cancelOrder() {
-  const html =
-    '<div class="modal" tabindex="-1" role="dialog"> <div class="modal-dialog" role="document"> <div class="modal-content"> <div class="modal-header"> <h5 class="modal-title">Modal title</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div> <div class="modal-body"> <p>Modal body text goes here.</p> </div> <div class="modal-footer"> <button type="button" class="btn btn-primary">Save changes</button> <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> </div> </div> </div> </div>';
-}
-
+/**
+ * Confirmar orden
+ */
 function confirmOrder() {
   var listado = [];
   var i = 1;
@@ -344,10 +397,25 @@ function confirmOrder() {
   console.log(listado);
 }
 
+/**
+ * Cancelar orden
+ * @param {} element
+ */
 function cancelOrder(element) {
   if (element) {
-    console.log(element);
+    //console.log(element);
     cart = {};
     goToCart();
+    items = amountOfItems();
+    cart_items.innerHTML = items + " items";
   }
+}
+
+/**
+ * Numeros con dos decimales
+ * @param {*} num
+ * @returns
+ */
+function formatNumbers(num) {
+  return (Math.round(num * 100) / 100).toFixed(2);
 }
