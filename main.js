@@ -168,14 +168,51 @@ function goToCart() {
 
     total += price;
   }
-  var table_foot =
-    '<div class="row"><div class="col"><p class="fw-bold">Total:$' +
-    total +
-    '</p></div><div class="col"><div class="float-end"><button class="btn btn-danger">Cancel</button><button class="btn btn-light">Confirmn</button></div></div></div>';
-  var table_end = document.createElement("div");
-  table_end.setAttribute("id", "table_end");
-  table_end.innerHTML = table_foot;
-  product_list.appendChild(table_end);
+  var div_row = document.createElement("div");
+  div_row.classList.add("row");
+  var div_col1 = document.createElement("div");
+  div_col1.classList.add("col");
+  div_row.appendChild(div_col1);
+
+  var p_tot = document.createElement("p");
+  p_tot.setAttribute("id", "total_money");
+  p_tot.classList.add("fw-bold");
+  p_tot.innerHTML = "Total: $" + total;
+  div_col1.appendChild(p_tot);
+
+  var div_col2 = document.createElement("div");
+  div_col2.classList.add("col", "float-end");
+  div_row.appendChild(div_col2);
+
+  var div_3 = document.createElement("div");
+  div_3.classList.add("float-end");
+  div_col2.appendChild(div_3);
+
+  var cancel = document.createElement("button");
+  cancel.classList.add("btn", "btn-danger");
+  cancel.innerHTML = "Cancel";
+  cancel.addEventListener(
+    "click",
+    function () {
+      cancelOrder();
+    },
+    false
+  );
+  div_3.appendChild(cancel);
+
+  var confirm = document.createElement("button");
+  confirm.classList.add("btn", "btn-light");
+  confirm.innerHTML = "Confirm";
+  confirm.addEventListener(
+    "click",
+    function () {
+      confirmOrder();
+    },
+    false
+  );
+  div_3.appendChild(confirm);
+
+  product_list.appendChild(div_row);
 }
 
 function amountOfItems() {
@@ -192,12 +229,8 @@ function addProduct(product_name) {
   const thisRow = document.getElementById(product_name);
   addQtyRow(thisRow);
   const total = calcTotal();
-  const table_foot =
-    '<div class="row"><div class="col"><p class="fw-bold">Total:$' +
-    total +
-    '</p></div><div class="col"><div class="float-end"><button class="btn btn-danger">Cancel</button><button class="btn btn-light">Confirmn</button></div></div></div>';
-  const table_end = document.getElementById("table_end");
-  table_end.innerHTML = table_foot;
+  const total_money = document.getElementById("total_money");
+  total_money.innerHTML = "Total: $" + total;
 }
 
 function removeProduct(product_name) {
@@ -206,12 +239,8 @@ function removeProduct(product_name) {
   const thisRow = document.getElementById(product_name);
   rmQtyRow(thisRow);
   const total = calcTotal();
-  const table_foot =
-    '<div class="row"><div class="col"><p class="fw-bold">Total:$' +
-    total +
-    '</p></div><div class="col"><div class="float-end"><button class="btn btn-danger">Cancel</button><button class="btn btn-light">Confirmn</button></div></div></div>';
-  const table_end = document.getElementById("table_end");
-  table_end.innerHTML = table_foot;
+  const total_money = document.getElementById("total_money");
+  total_money.innerHTML = "Total: $" + total;
 }
 
 function createRow(newRow, key, value, i) {
@@ -287,4 +316,24 @@ function calcTotal() {
     total += price * qty;
   }
   return total;
+}
+
+function cancelOrder() {
+  const html =
+    '<div class="modal" tabindex="-1" role="dialog"> <div class="modal-dialog" role="document"> <div class="modal-content"> <div class="modal-header"> <h5 class="modal-title">Modal title</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div> <div class="modal-body"> <p>Modal body text goes here.</p> </div> <div class="modal-footer"> <button type="button" class="btn btn-primary">Save changes</button> <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> </div> </div> </div> </div>';
+}
+
+function confirmOrder() {
+  var listado = [];
+  var i = 1;
+  for (const [key, value] of Object.entries(cart)) {
+    var objeto = {};
+    objeto["item"] = i;
+    objeto["quantity"] = value["qty"];
+    objeto["description"] = key;
+    objeto["unitPrice"] = value["product"]["price"];
+    i += 1;
+    listado.push(objeto);
+  }
+  console.log(listado);
 }
