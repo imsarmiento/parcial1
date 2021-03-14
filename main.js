@@ -5,6 +5,7 @@ const product_list = document.getElementById("product-list");
 const cartButton = document.getElementById("cart");
 const cart_items = document.getElementById("cart-items");
 const page_title = document.getElementById("page-title");
+const confirm_cancel_button = document.getElementById("confirm-cancel-button");
 
 cartButton.addEventListener(
   "click",
@@ -13,6 +14,8 @@ cartButton.addEventListener(
   },
   false
 );
+
+confirm_cancel_button.onclick = cancelOrder;
 
 var cart = {};
 
@@ -189,7 +192,10 @@ function goToCart() {
   div_col2.appendChild(div_3);
 
   var cancel = document.createElement("button");
-  cancel.classList.add("btn", "btn-danger");
+  cancel.setAttribute("type", "button");
+  cancel.classList.add("btn", "red-button", "mx-1");
+  cancel.setAttribute("data-bs-toggle", "modal");
+  cancel.setAttribute("data-bs-target", "#exampleModal");
   cancel.innerHTML = "Cancel";
   cancel.addEventListener(
     "click",
@@ -201,8 +207,8 @@ function goToCart() {
   div_3.appendChild(cancel);
 
   var confirm = document.createElement("button");
-  confirm.classList.add("btn", "btn-light");
-  confirm.innerHTML = "Confirm";
+  confirm.classList.add("btn", "white-button", "mx-1");
+  confirm.innerHTML = "Confirm order";
   confirm.addEventListener(
     "click",
     function () {
@@ -336,4 +342,12 @@ function confirmOrder() {
     listado.push(objeto);
   }
   console.log(listado);
+}
+
+function cancelOrder(element) {
+  if (element) {
+    console.log(element);
+    cart = {};
+    goToCart();
+  }
 }

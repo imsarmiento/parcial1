@@ -13,3 +13,25 @@ h1 {
 .d-flex {
   display: flex;
 }
+
+.red-button {
+  background-color: rgb(255, 82, 82);
+  color: black;
+  padding: 0.6em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border: 1px solid black;
+}
+
+.white-button {
+  background-color: rgb(238, 238, 225);
+  color: black;
+  padding: 0.6em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border: 1px solid black;
+}
