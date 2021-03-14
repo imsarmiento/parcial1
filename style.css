@@ -1,0 +1,15 @@
+h1 {
+  font-family: "Satisfy", cursive;
+}
+
+#cart {
+  width: 3em;
+}
+
+.v-center {
+  vertical-align: super;
+}
+
+.d-flex {
+  display: flex;
+}
